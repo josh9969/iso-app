@@ -4,6 +4,7 @@ import requests
 from shapely.geometry import Polygon, Point
 import matplotlib.pyplot as plt
 import contextily as ctx
+from matplotlib.backends.backend_pdf import PdfPages
 
 API_KEY = '5b3ce3597851110001cf6248bef98e4409a844eda72cf1d6fbd72a55'
 
@@ -48,6 +49,21 @@ def main():
                 ax.set_ylabel('Latitude')
 
                 st.pyplot(fig)
+
+                save_as_pdf = st.button('Save as PDF')
+                if save_as_pdf:
+                    pdf_path = 'isochrones_map.pdf'
+                    with PdfPages(pdf_path) as pdf:
+                        pdf.savefig(fig, bbox_inches='tight')
+                    st.success(f'Map saved as {pdf_path}')
+                    with open(pdf_path, 'rb') as file:
+                        btn = st.download_button(
+                            label="Download PDF",
+                            data=file,
+                            file_name=pdf_path,
+                            mime="application/pdf"
+                        )
+
         except requests.HTTPError as e:
             st.error(f"HTTP error occurred: {e}")
         except Exception as e:
